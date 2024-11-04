@@ -14,8 +14,6 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar, Line, Pie } from 'react-chartjs-2';
-import { ResizableBox } from 'react-resizable';
-import 'react-resizable/css/styles.css'; // Import styles for resizable
 import { FaTimes } from 'react-icons/fa'; // Import the icon for the close button
 
 // Register the components
@@ -23,7 +21,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineEleme
 
 const ChartGrid = () => {
   const [charts, setCharts] = useState([]);
-
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'chart',
     drop: (item) => addChart(item.type),
@@ -33,7 +30,7 @@ const ChartGrid = () => {
   }));
 
   const addChart = (type) => {
-    setCharts((prevCharts) => [...prevCharts, { id: Date.now(), type }]);
+    setCharts((prevCharts) => [...prevCharts, { id: Date.now(), type, width: 300, height: 300 }]);
   };
 
   const deleteChart = (id) => {
@@ -72,20 +69,39 @@ const ChartGrid = () => {
     return null;
   };
 
+  const handleMouseDown = (e, chartId) => {
+    const chart = charts.find(c => c.id === chartId);
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startWidth = chart.width;
+    const startHeight = chart.height;
+
+    const onMouseMove = (e) => {
+      const newWidth = Math.max(100, startWidth + (e.clientX - startX));
+      const newHeight = Math.max(100, startHeight + (e.clientY - startY));
+      setCharts(charts.map(c => c.id === chartId ? { ...c, width: newWidth, height: newHeight } : c));
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
   return (
     <div
       ref={drop}
       className={`flex-grow p-4 grid grid-cols-2 gap-4 ${isOver ? 'bg-gray-200' : ''}`}
     >
       {charts.map((chart) => (
-        <ResizableBox
+        <div
           key={chart.id}
-          width={300}
-          height={300}
-          minConstraints={[100, 100]}
-          maxConstraints={[600, 600]}
-          className="p-4 border rounded bg-white shadow relative"
-          handle={<span className="resizable-handle" />}
+          className="chart-container relative p-4 border rounded bg-white shadow"
+          style={{ width: chart.width, height: chart.height }}
+          onMouseDown={(e) => handleMouseDown(e, chart.id)}
         >
           {/* Close button */}
           <button
@@ -96,7 +112,7 @@ const ChartGrid = () => {
             <FaTimes size={20} />
           </button>
           {getChartComponent(chart)}
-        </ResizableBox>
+        </div>
       ))}
     </div>
   );

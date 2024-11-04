@@ -10,3 +10,17 @@
     z-index: 1; /* Ensure it is above other elements */
   }
   
+  /* src/components/ChartGrid.css */
+.chart-container {
+  cursor: nwse-resize; /* Cursor indicating diagonal resizing */
+  position: relative; /* Keep the button and other elements within the container */
+}
+
+.chart-container:hover {
+  cursor: nwse-resize; /* Change cursor on hover */
+}
+
+/* Optional: Change cursor to default when resizing is active */
+.chart-container.resizing {
+  cursor: nwse-resize;
+}
