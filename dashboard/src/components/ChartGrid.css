@@ -1,0 +1,12 @@
+/* Add this to your CSS file */
+.resizable-handle {
+    width: 10px;
+    height: 10px;
+    background-color: #007bff; /* Change color as needed */
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+    z-index: 1; /* Ensure it is above other elements */
+  }
+  
