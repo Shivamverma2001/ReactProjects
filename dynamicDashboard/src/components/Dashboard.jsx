@@ -15,8 +15,9 @@ import {
 } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { ResizableBox } from 'react-resizable';
+import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-resizable/css/styles.css';
+import 'react-grid-layout/css/styles.css';
 
 // Register required chart components
 ChartJS.register(
@@ -31,6 +32,8 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const Dashboard = () => {
   const [chartDataList, setChartDataList] = useState([]);
@@ -148,63 +151,50 @@ const Dashboard = () => {
     if (selectedChartType) {
       setChartDataList((prev) => [
         ...prev,
-        { type: selectedChartType, data: selectedData, backgroundColor: selectedData.datasets[0].backgroundColor },
+        { id: `chart-${Date.now()}`, type: selectedChartType, data: selectedData, backgroundColor: selectedData.datasets[0].backgroundColor },
       ]);
       setDataSelected(false);
     }
   };
 
-  const changeChartTypeOrColor = (index, newType) => {
-    const updatedCharts = [...chartDataList];
-    updatedCharts[index].type = newType;
+  const changeChartTypeOrColor = (id, newType) => {
+    const updatedCharts = chartDataList.map(chart => chart.id === id ? { ...chart, type: newType } : chart);
     setChartDataList(updatedCharts);
   };
 
-  const changeChartColor = (index, newColor) => {
-    const updatedCharts = [...chartDataList];
-    updatedCharts[index].data.datasets[0].backgroundColor = newColor;
+  const changeChartColor = (id, newColor) => {
+    const updatedCharts = chartDataList.map(chart => chart.id === id ? {
+      ...chart,
+      data: {
+        ...chart.data,
+        datasets: chart.data.datasets.map(ds => ({ ...ds, backgroundColor: newColor })),
+      },
+    } : chart);
     setChartDataList(updatedCharts);
   };
 
-  const renderChart = (chart, width, height) => {
-    const options = {
-      responsive: true,
-      maintainAspectRatio: false,
-    };
+  const deleteChart = (id) => {
+    const updatedCharts = chartDataList.filter(chart => chart.id !== id);
+    setChartDataList(updatedCharts);
+  };
 
+  const renderChart = (chart) => {
+    const options = { responsive: true, maintainAspectRatio: false };
     switch (chart.type) {
-      case 'Bar':
-        return <Bar data={chart.data} options={options} />;
-      case 'Line':
-        return <Line data={chart.data} options={options} />;
-      case 'Pie':
-        return <Pie data={chart.data} options={options} />;
-      case 'Doughnut':
-        return <Doughnut data={chart.data} options={options} />;
-      case 'Radar':
-        return <Radar data={chart.data} options={options} />;
-      default:
-        return null;
+      case 'Bar': return <Bar data={chart.data} options={options} />;
+      case 'Line': return <Line data={chart.data} options={options} />;
+      case 'Pie': return <Pie data={chart.data} options={options} />;
+      case 'Doughnut': return <Doughnut data={chart.data} options={options} />;
+      case 'Radar': return <Radar data={chart.data} options={options} />;
+      default: return null;
     }
-  };
-
-  const deleteChart = (index) => {
-    const updatedCharts = chartDataList.filter((_, i) => i !== index);
-    setChartDataList(updatedCharts);
   };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-4">Dynamic Dashboard</h1>
-
-      <label htmlFor="datasetSelect" className="block mb-2">
-        Choose Dataset:
-      </label>
-      <select
-        id="datasetSelect"
-        onChange={handleDatasetChange}
-        className="mb-4 p-2 border rounded"
-      >
+      <label htmlFor="datasetSelect" className="block mb-2">Choose Dataset:</label>
+      <select id="datasetSelect" onChange={handleDatasetChange} className="mb-4 p-2 border rounded">
         <option value="">Select Dataset</option>
         <option value="dataOne">Monthly Data</option>
         <option value="dataTwo">Weekly Data</option>
@@ -212,17 +202,10 @@ const Dashboard = () => {
         <option value="dataFour">Quarterly Data</option>
         <option value="dataFive">Regional Sales</option>
       </select>
-
       {dataSelected && (
         <>
-          <label htmlFor="chartTypeSelect" className="block mb-2">
-            Choose Chart Type:
-          </label>
-          <select
-            id="chartTypeSelect"
-            onChange={handleChartTypeChange}
-            className="mb-4 p-2 border rounded"
-          >
+          <label htmlFor="chartTypeSelect" className="block mb-2">Choose Chart Type:</label>
+          <select id="chartTypeSelect" onChange={handleChartTypeChange} className="mb-4 p-2 border rounded">
             <option value="">Select Chart Type</option>
             <option value="Bar">Bar Chart</option>
             <option value="Line">Line Chart</option>
@@ -232,56 +215,33 @@ const Dashboard = () => {
           </select>
         </>
       )}
-
-      <div className="flex flex-wrap gap-4 box-border">
-        {chartDataList.map((chart, index) => (
-          <ResizableBox
-            key={index}
-            width={400}
-            height={500} // Increased height for the chart frame
-            minConstraints={[200, 200]}
-            maxConstraints={[600, 600]}
-            resizeHandles={['se']} // Bottom right corner for resizing
-            className="bg-white shadow-lg border rounded relative"
-          >
-            <div className='mb-10'>
-            <FontAwesomeIcon
-              icon={faTimes}
-              className="absolute top-2 right-2 cursor-pointer text-red-500"
-              onClick={() => deleteChart(index)}
-            />
-
-            <div className="flex gap-2 absolute top-2 left-2 z-10">
-              <select
-                onChange={(e) => changeChartTypeOrColor(index, e.target.value)}
-                className="p-1 border rounded"
-                defaultValue={chart.type}
-              >
-                <option value="Bar">Bar Chart</option>
-                <option value="Line">Line Chart</option>
-                <option value="Pie">Pie Chart</option>
-                <option value="Doughnut">Doughnut Chart</option>
-                <option value="Radar">Radar Chart</option>
-              </select>
-
-              <select
-                onChange={(e) => changeChartColor(index, e.target.value)}
-                className="p-1 border rounded"
-                defaultValue={chart.backgroundColor}
-              >
-                {colorOptions.map((color) => (
-                  <option key={color.value} value={color.value}>
-                    {color.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+      <ResponsiveGridLayout
+        className="layout"
+        layouts={{ lg: chartDataList.map((chart, index) => ({ i: chart.id, x: index % 3, y: Math.floor(index / 3), w: 1, h: 2 })) }}
+        cols={{ lg: 3 }}
+        rowHeight={200}
+        width={1200}
+      >
+        {chartDataList.map((chart) => (
+          
+          <div key={chart.id} className="bg-white shadow-lg border rounded relative p-2">
+            <select onChange={(e) => changeChartTypeOrColor(chart.id, e.target.value)} className="mt-2">
+              <option value="">Change Chart Type</option>
+              <option value="Bar">Bar</option>
+              <option value="Line">Line</option>
+              <option value="Pie">Pie</option>
+              <option value="Doughnut">Doughnut</option>
+              <option value="Radar">Radar</option>
+            </select>
+            <select onChange={(e) => changeChartColor(chart.id, e.target.value)} className="mt-2">
+              <option value="">Change Chart Color</option>
+              {colorOptions.map(color => <option key={color.value} value={color.value}>{color.name}</option>)}
+            </select>
+            <FontAwesomeIcon icon={faTimes} className="absolute top-2 right-2 cursor-pointer" onClick={() => deleteChart(chart.id)} />
+            {renderChart(chart)}
           </div>
-
-            <div className="h-full">{renderChart(chart, 400, 500)}</div>
-          </ResizableBox>
         ))}
-      </div>
+      </ResponsiveGridLayout>
     </div>
   );
 };
