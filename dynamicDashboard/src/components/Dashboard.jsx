@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bar, Line, Pie, Doughnut, Radar } from 'react-chartjs-2';
+import { Bar, Line, Pie, Doughnut, Radar, PolarArea, Bubble, Scatter } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -186,6 +186,9 @@ const Dashboard = () => {
       case 'Pie': return <Pie data={chart.data} options={options} />;
       case 'Doughnut': return <Doughnut data={chart.data} options={options} />;
       case 'Radar': return <Radar data={chart.data} options={options} />;
+      case 'PolarArea': return <PolarArea data={chart.data} options={options} />;
+      case 'Bubble': return <Bubble data={chart.data} options={options} />;
+      case 'Scatter': return <Scatter data={chart.data} options={options} />;
       default: return null;
     }
   };
@@ -206,12 +209,15 @@ const Dashboard = () => {
         <>
           <label htmlFor="chartTypeSelect" className="block mb-2">Choose Chart Type:</label>
           <select id="chartTypeSelect" onChange={handleChartTypeChange} className="mb-4 p-2 border rounded">
-            <option value="">Select Chart Type</option>
+            <option value="">Chart Type</option>
             <option value="Bar">Bar Chart</option>
             <option value="Line">Line Chart</option>
             <option value="Pie">Pie Chart</option>
             <option value="Doughnut">Doughnut Chart</option>
             <option value="Radar">Radar Chart</option>
+            <option value="PolarArea">Polar Area</option>
+            <option value="Bubble">Bubble Chart</option>
+            <option value="Scatter">Scatter Chart</option>
           </select>
         </>
       )}
@@ -232,6 +238,9 @@ const Dashboard = () => {
               <option value="Pie">Pie</option>
               <option value="Doughnut">Doughnut</option>
               <option value="Radar">Radar</option>
+              <option value="PolarArea">PolarArea</option>
+              <option value="Bubble">Bubble</option>
+              <option value="Scatter">Scatter</option>
             </select>
             <select onChange={(e) => changeChartColor(chart.id, e.target.value)} className="mt-2">
               <option value="">Change Chart Color</option>
