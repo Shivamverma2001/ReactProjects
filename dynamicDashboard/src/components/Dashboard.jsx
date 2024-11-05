@@ -1,4 +1,3 @@
-// src/Dashboard.js
 import React, { useState } from 'react';
 import { Bar, Line, Pie, Doughnut, Radar } from 'react-chartjs-2';
 import {
@@ -12,10 +11,12 @@ import {
   RadialLinearScale,
   Title,
   Tooltip,
-  Legend
+  Legend,
 } from 'chart.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { ResizableBox } from 'react-resizable';
+import 'react-resizable/css/styles.css';
 
 // Register required chart components
 ChartJS.register(
@@ -34,158 +35,175 @@ ChartJS.register(
 const Dashboard = () => {
   const [chartDataList, setChartDataList] = useState([]);
   const [selectedData, setSelectedData] = useState([]);
-  const [chartType, setChartType] = useState("");
+  const [chartType, setChartType] = useState('');
   const [dataSelected, setDataSelected] = useState(false);
 
   // Define dataset functions
-  const getDataOne = () => [
-    { label: 'Jan', value: 120 },
-    { label: 'Feb', value: 200 },
-    { label: 'Mar', value: 150 },
-    { label: 'Apr', value: 80 },
-    { label: 'May', value: 220 }
-  ];
+  const getDataOne = () => ({
+    labels: ['January', 'February', 'March', 'April', 'May'],
+    datasets: [
+      {
+        label: 'Monthly Sales',
+        data: [30, 20, 50, 40, 70],
+        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1,
+      },
+    ],
+  });
 
-  const getDataTwo = () => [
-    { label: 'Mon', value: 300 },
-    { label: 'Tue', value: 250 },
-    { label: 'Wed', value: 400 },
-    { label: 'Thu', value: 150 },
-    { label: 'Fri', value: 330 }
-  ];
+  const getDataTwo = () => ({
+    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+    datasets: [
+      {
+        label: 'Weekly Sales',
+        data: [20, 35, 60, 45],
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+      },
+    ],
+  });
 
-  const getDataThree = () => [
-    { label: 'Product A', value: 500 },
-    { label: 'Product B', value: 700 },
-    { label: 'Product C', value: 300 },
-    { label: 'Product D', value: 400 }
-  ];
+  const getDataThree = () => ({
+    labels: ['Product A', 'Product B', 'Product C'],
+    datasets: [
+      {
+        label: 'Product Sales',
+        data: [120, 150, 80],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.6)',
+          'rgba(54, 162, 235, 0.6)',
+          'rgba(255, 206, 86, 0.6)',
+        ],
+      },
+    ],
+  });
 
-  const getDataFour = () => [
-    { label: 'Q1', value: 800 },
-    { label: 'Q2', value: 950 },
-    { label: 'Q3', value: 700 },
-    { label: 'Q4', value: 850 }
-  ];
+  const getDataFour = () => ({
+    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+    datasets: [
+      {
+        label: 'Quarterly Performance',
+        data: [200, 300, 400, 500],
+        backgroundColor: 'rgba(255, 206, 86, 0.6)',
+        borderColor: 'rgba(255, 206, 86, 1)',
+        borderWidth: 1,
+      },
+    ],
+  });
 
-  const getDataFive = () => [
-    { label: 'North', value: 600 },
-    { label: 'South', value: 450 },
-    { label: 'East', value: 700 },
-    { label: 'West', value: 500 }
-  ];
+  const getDataFive = () => ({
+    labels: ['Region 1', 'Region 2', 'Region 3'],
+    datasets: [
+      {
+        label: 'Regional Sales',
+        data: [50, 75, 100],
+        backgroundColor: [
+          'rgba(255, 159, 64, 0.6)',
+          'rgba(153, 102, 255, 0.6)',
+          'rgba(75, 192, 192, 0.6)',
+        ],
+      },
+    ],
+  });
 
-  // Define color options for charts
+  // Define color options with names
   const colorOptions = [
-    'rgba(75,192,192,0.4)',
-    'rgba(255,99,132,0.4)',
-    'rgba(54,162,235,0.4)',
-    'rgba(255,206,86,0.4)',
-    'rgba(153,102,255,0.4)',
+    { name: 'Red', value: 'rgba(255, 99, 132, 0.6)' },
+    { name: 'Blue', value: 'rgba(54, 162, 235, 0.6)' },
+    { name: 'Yellow', value: 'rgba(255, 206, 86, 0.6)' },
+    { name: 'Green', value: 'rgba(75, 192, 192, 0.6)' },
+    { name: 'Purple', value: 'rgba(153, 102, 255, 0.6)' },
+    { name: 'Orange', value: 'rgba(255, 159, 64, 0.6)' },
   ];
 
-  // Handle dataset selection
   const handleDatasetChange = (event) => {
     const selectedOption = event.target.value;
-
+    setDataSelected(true);
     switch (selectedOption) {
       case 'dataOne':
         setSelectedData(getDataOne());
-        setDataSelected(true);
         break;
       case 'dataTwo':
         setSelectedData(getDataTwo());
-        setDataSelected(true);
         break;
       case 'dataThree':
         setSelectedData(getDataThree());
-        setDataSelected(true);
         break;
       case 'dataFour':
         setSelectedData(getDataFour());
-        setDataSelected(true);
         break;
       case 'dataFive':
         setSelectedData(getDataFive());
-        setDataSelected(true);
         break;
       default:
-        setSelectedData([]);
-        setDataSelected(false);
+        break;
     }
   };
 
-  // Handle chart type selection and display the chart
   const handleChartTypeChange = (event) => {
     const selectedChartType = event.target.value;
+    setChartType(selectedChartType);
+    if (selectedChartType) {
+      setChartDataList((prev) => [
+        ...prev,
+        { type: selectedChartType, data: selectedData, backgroundColor: selectedData.datasets[0].backgroundColor },
+      ]);
+      setDataSelected(false);
+    }
+  };
 
-    const labels = selectedData.map(item => item.label);
-    const values = selectedData.map(item => item.value);
+  const changeChartTypeOrColor = (index, newType) => {
+    const updatedCharts = [...chartDataList];
+    updatedCharts[index].type = newType;
+    setChartDataList(updatedCharts);
+  };
 
-    const data = {
-      labels,
-      datasets: [
-        {
-          label: 'Dataset',
-          data: values,
-          backgroundColor: colorOptions[0], // Default color
-          borderColor: colorOptions[0].replace(/0.4/, '1'), // Solid color for border
-          borderWidth: 1
-        }
-      ]
+  const changeChartColor = (index, newColor) => {
+    const updatedCharts = [...chartDataList];
+    updatedCharts[index].data.datasets[0].backgroundColor = newColor;
+    setChartDataList(updatedCharts);
+  };
+
+  const renderChart = (chart, width, height) => {
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
     };
 
-    // Add new chart to the list
-    setChartDataList([...chartDataList, { type: selectedChartType, data, color: colorOptions[0] }]);
-
-    // Reset selections
-    setSelectedData([]);
-    setChartType("");
-    setDataSelected(false);
-  };
-
-  // Handle changing chart type or color of an existing chart
-  const changeChartTypeOrColor = (index, newType, newColor) => {
-    const updatedChartList = chartDataList.map((chart, i) =>
-      i === index ? { ...chart, type: newType, color: newColor, data: { ...chart.data, datasets: [{ ...chart.data.datasets[0], backgroundColor: newColor, borderColor: newColor.replace(/0.4/, '1') }] } } : chart
-    );
-    setChartDataList(updatedChartList);
-  };
-
-  // Render chart based on type
-  const renderChart = (chart) => {
     switch (chart.type) {
       case 'Bar':
-        return <Bar data={chart.data} />;
+        return <Bar data={chart.data} options={options} />;
       case 'Line':
-        return <Line data={chart.data} />;
+        return <Line data={chart.data} options={options} />;
       case 'Pie':
-        return <Pie data={chart.data} />;
+        return <Pie data={chart.data} options={options} />;
       case 'Doughnut':
-        return <Doughnut data={chart.data} />;
+        return <Doughnut data={chart.data} options={options} />;
       case 'Radar':
-        return <Radar data={chart.data} />;
+        return <Radar data={chart.data} options={options} />;
       default:
         return null;
     }
   };
 
-  // Delete chart from the list
   const deleteChart = (index) => {
     const updatedCharts = chartDataList.filter((_, i) => i !== index);
     setChartDataList(updatedCharts);
   };
 
   return (
-    <div>
-      <h1>Dynamic Dashboard</h1>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-2xl font-bold mb-4">Dynamic Dashboard</h1>
 
-      {/* Dataset Dropdown */}
-      <label htmlFor="datasetSelect">Choose Dataset:</label>
+      <label htmlFor="datasetSelect" className="block mb-2">
+        Choose Dataset:
+      </label>
       <select
         id="datasetSelect"
         onChange={handleDatasetChange}
-        value={dataSelected ? selectedData : ""}
+        className="mb-4 p-2 border rounded"
       >
         <option value="">Select Dataset</option>
         <option value="dataOne">Monthly Data</option>
@@ -195,14 +213,15 @@ const Dashboard = () => {
         <option value="dataFive">Regional Sales</option>
       </select>
 
-      {/* Conditionally render Chart Type Dropdown */}
       {dataSelected && (
         <>
-          <label htmlFor="chartTypeSelect">Choose Chart Type:</label>
+          <label htmlFor="chartTypeSelect" className="block mb-2">
+            Choose Chart Type:
+          </label>
           <select
             id="chartTypeSelect"
             onChange={handleChartTypeChange}
-            value={chartType}
+            className="mb-4 p-2 border rounded"
           >
             <option value="">Select Chart Type</option>
             <option value="Bar">Bar Chart</option>
@@ -214,29 +233,27 @@ const Dashboard = () => {
         </>
       )}
 
-      {/* Render all selected charts */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+      <div className="flex flex-wrap gap-4">
         {chartDataList.map((chart, index) => (
-          <div key={index} style={{ position: 'relative', width: '400px', height: '400px' }}>
-            {/* Cancel icon */}
+          <ResizableBox
+            key={index}
+            width={400}
+            height={400}
+            minConstraints={[200, 200]}
+            maxConstraints={[600, 600]}
+            resizeHandles={['se']} // Bottom right corner for resizing
+            className="bg-white shadow-lg border rounded relative"
+          >
             <FontAwesomeIcon
               icon={faTimes}
-              style={{
-                position: 'absolute',
-                top: '10px',
-                right: '10px',
-                cursor: 'pointer',
-                color: 'red',
-                zIndex: 1
-              }}
+              className="absolute top-2 right-2 cursor-pointer text-red-500"
               onClick={() => deleteChart(index)}
             />
 
-            {/* Chart type dropdown for each chart */}
             <select
-              style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1 }}
               value={chart.type}
-              onChange={(e) => changeChartTypeOrColor(index, e.target.value, chart.color)}
+              onChange={(e) => changeChartTypeOrColor(index, e.target.value)}
+              className="absolute top-2 left-2 z-10 bg-white border rounded"
             >
               <option value="Bar">Bar Chart</option>
               <option value="Line">Line Chart</option>
@@ -245,20 +262,22 @@ const Dashboard = () => {
               <option value="Radar">Radar Chart</option>
             </select>
 
-            {/* Color dropdown for each chart */}
             <select
-              style={{ position: 'absolute', top: '10px', left: '150px', zIndex: 1 }}
-              value={chart.color}
-              onChange={(e) => changeChartTypeOrColor(index, chart.type, e.target.value)}
+              value={chart.data.datasets[0].backgroundColor}
+              onChange={(e) => changeChartColor(index, e.target.value)}
+              className="absolute top-2 left-40 z-10 bg-white border rounded"
             >
               {colorOptions.map((color, colorIndex) => (
-                <option key={colorIndex} value={color}>{`Color ${colorIndex + 1}`}</option>
+                <option key={colorIndex} value={color.value}>
+                  {color.name}
+                </option>
               ))}
             </select>
 
-            {/* Render the chart */}
-            {renderChart(chart)}
-          </div>
+            <div style={{ width: '100%', height: '100%' }}>
+              {renderChart(chart, 400, 400)}
+            </div>
+          </ResizableBox>
         ))}
       </div>
     </div>
