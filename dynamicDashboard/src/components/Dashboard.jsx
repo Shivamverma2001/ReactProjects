@@ -31,6 +31,9 @@ ChartJS.register(
 
 const Dashboard = () => {
   const [chartDataList, setChartDataList] = useState([]);
+  const [selectedData, setSelectedData] = useState([]);
+  const [chartType, setChartType] = useState("");
+  const [dataSelected, setDataSelected] = useState(false);
 
   // Define dataset functions
   const getDataOne = () => [
@@ -70,9 +73,6 @@ const Dashboard = () => {
     { label: 'West', value: 500 }
   ];
 
-  const [selectedData, setSelectedData] = useState([]);
-  const [chartType, setChartType] = useState("");
-
   // Handle dataset selection
   const handleDatasetChange = (event) => {
     const selectedOption = event.target.value;
@@ -80,28 +80,33 @@ const Dashboard = () => {
     switch (selectedOption) {
       case 'dataOne':
         setSelectedData(getDataOne());
+        setDataSelected(true);
         break;
       case 'dataTwo':
         setSelectedData(getDataTwo());
+        setDataSelected(true);
         break;
       case 'dataThree':
         setSelectedData(getDataThree());
+        setDataSelected(true);
         break;
       case 'dataFour':
         setSelectedData(getDataFour());
+        setDataSelected(true);
         break;
       case 'dataFive':
         setSelectedData(getDataFive());
+        setDataSelected(true);
         break;
       default:
         setSelectedData([]);
+        setDataSelected(false);
     }
   };
 
   // Handle chart type selection and display the chart
   const handleChartTypeChange = (event) => {
     const selectedChartType = event.target.value;
-    setChartType(selectedChartType);
 
     const labels = selectedData.map(item => item.label);
     const values = selectedData.map(item => item.value);
@@ -119,7 +124,13 @@ const Dashboard = () => {
       ]
     };
 
+    // Add new chart to the list
     setChartDataList([...chartDataList, { type: selectedChartType, data }]);
+
+    // Reset selections
+    setSelectedData([]);
+    setChartType("");
+    setDataSelected(false);
   };
 
   // Render chart based on type
@@ -146,7 +157,11 @@ const Dashboard = () => {
 
       {/* Dataset Dropdown */}
       <label htmlFor="datasetSelect">Choose Dataset:</label>
-      <select id="datasetSelect" onChange={handleDatasetChange}>
+      <select
+        id="datasetSelect"
+        onChange={handleDatasetChange}
+        value={dataSelected ? selectedData : ""}
+      >
         <option value="">Select Dataset</option>
         <option value="dataOne">Monthly Data</option>
         <option value="dataTwo">Weekly Data</option>
@@ -155,16 +170,24 @@ const Dashboard = () => {
         <option value="dataFive">Regional Sales</option>
       </select>
 
-      {/* Chart Type Dropdown */}
-      <label htmlFor="chartTypeSelect">Choose Chart Type:</label>
-      <select id="chartTypeSelect" onChange={handleChartTypeChange}>
-        <option value="">Select Chart Type</option>
-        <option value="Bar">Bar Chart</option>
-        <option value="Line">Line Chart</option>
-        <option value="Pie">Pie Chart</option>
-        <option value="Doughnut">Doughnut Chart</option>
-        <option value="Radar">Radar Chart</option>
-      </select>
+      {/* Conditionally render Chart Type Dropdown */}
+      {dataSelected && (
+        <>
+          <label htmlFor="chartTypeSelect">Choose Chart Type:</label>
+          <select
+            id="chartTypeSelect"
+            onChange={handleChartTypeChange}
+            value={chartType}
+          >
+            <option value="">Select Chart Type</option>
+            <option value="Bar">Bar Chart</option>
+            <option value="Line">Line Chart</option>
+            <option value="Pie">Pie Chart</option>
+            <option value="Doughnut">Doughnut Chart</option>
+            <option value="Radar">Radar Chart</option>
+          </select>
+        </>
+      )}
 
       {/* Render all selected charts */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
