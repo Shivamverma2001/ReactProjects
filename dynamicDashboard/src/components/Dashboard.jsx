@@ -135,6 +135,14 @@ const Dashboard = () => {
     setDataSelected(false);
   };
 
+  // Handle changing chart type of an existing chart
+  const changeChartType = (index, newType) => {
+    const updatedChartList = chartDataList.map((chart, i) =>
+      i === index ? { ...chart, type: newType } : chart
+    );
+    setChartDataList(updatedChartList);
+  };
+
   // Render chart based on type
   const renderChart = (chart) => {
     switch (chart.type) {
@@ -214,6 +222,20 @@ const Dashboard = () => {
               }}
               onClick={() => deleteChart(index)}
             />
+
+            {/* Chart type dropdown for each chart */}
+            <select
+              style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1 }}
+              value={chart.type}
+              onChange={(e) => changeChartType(index, e.target.value)}
+            >
+              <option value="Bar">Bar Chart</option>
+              <option value="Line">Line Chart</option>
+              <option value="Pie">Pie Chart</option>
+              <option value="Doughnut">Doughnut Chart</option>
+              <option value="Radar">Radar Chart</option>
+            </select>
+
             {renderChart(chart)}
           </div>
         ))}
