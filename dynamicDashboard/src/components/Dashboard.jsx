@@ -233,50 +233,52 @@ const Dashboard = () => {
         </>
       )}
 
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 box-border">
         {chartDataList.map((chart, index) => (
           <ResizableBox
             key={index}
             width={400}
-            height={400}
+            height={500} // Increased height for the chart frame
             minConstraints={[200, 200]}
             maxConstraints={[600, 600]}
             resizeHandles={['se']} // Bottom right corner for resizing
             className="bg-white shadow-lg border rounded relative"
           >
+            <div className='mb-10'>
             <FontAwesomeIcon
               icon={faTimes}
               className="absolute top-2 right-2 cursor-pointer text-red-500"
               onClick={() => deleteChart(index)}
             />
 
-            <select
-              value={chart.type}
-              onChange={(e) => changeChartTypeOrColor(index, e.target.value)}
-              className="absolute top-2 left-2 z-10 bg-white border rounded"
-            >
-              <option value="Bar">Bar Chart</option>
-              <option value="Line">Line Chart</option>
-              <option value="Pie">Pie Chart</option>
-              <option value="Doughnut">Doughnut Chart</option>
-              <option value="Radar">Radar Chart</option>
-            </select>
+            <div className="flex gap-2 absolute top-2 left-2 z-10">
+              <select
+                onChange={(e) => changeChartTypeOrColor(index, e.target.value)}
+                className="p-1 border rounded"
+                defaultValue={chart.type}
+              >
+                <option value="Bar">Bar Chart</option>
+                <option value="Line">Line Chart</option>
+                <option value="Pie">Pie Chart</option>
+                <option value="Doughnut">Doughnut Chart</option>
+                <option value="Radar">Radar Chart</option>
+              </select>
 
-            <select
-              value={chart.data.datasets[0].backgroundColor}
-              onChange={(e) => changeChartColor(index, e.target.value)}
-              className="absolute top-2 left-40 z-10 bg-white border rounded"
-            >
-              {colorOptions.map((color, colorIndex) => (
-                <option key={colorIndex} value={color.value}>
-                  {color.name}
-                </option>
-              ))}
-            </select>
-
-            <div style={{ width: '100%', height: '100%' }}>
-              {renderChart(chart, 400, 400)}
+              <select
+                onChange={(e) => changeChartColor(index, e.target.value)}
+                className="p-1 border rounded"
+                defaultValue={chart.backgroundColor}
+              >
+                {colorOptions.map((color) => (
+                  <option key={color.value} value={color.value}>
+                    {color.name}
+                  </option>
+                ))}
+              </select>
             </div>
+          </div>
+
+            <div className="h-full">{renderChart(chart, 400, 500)}</div>
           </ResizableBox>
         ))}
       </div>
