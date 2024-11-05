@@ -14,6 +14,8 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 // Register required chart components
 ChartJS.register(
@@ -151,6 +153,12 @@ const Dashboard = () => {
     }
   };
 
+  // Delete chart from the list
+  const deleteChart = (index) => {
+    const updatedCharts = chartDataList.filter((_, i) => i !== index);
+    setChartDataList(updatedCharts);
+  };
+
   return (
     <div>
       <h1>Dynamic Dashboard</h1>
@@ -192,7 +200,20 @@ const Dashboard = () => {
       {/* Render all selected charts */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
         {chartDataList.map((chart, index) => (
-          <div key={index} style={{ width: '400px', height: '400px' }}>
+          <div key={index} style={{ position: 'relative', width: '400px', height: '400px' }}>
+            {/* Cancel icon */}
+            <FontAwesomeIcon
+              icon={faTimes}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                cursor: 'pointer',
+                color: 'red',
+                zIndex: 1
+              }}
+              onClick={() => deleteChart(index)}
+            />
             {renderChart(chart)}
           </div>
         ))}
