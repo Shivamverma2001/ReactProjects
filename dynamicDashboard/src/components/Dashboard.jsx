@@ -75,6 +75,15 @@ const Dashboard = () => {
     { label: 'West', value: 500 }
   ];
 
+  // Define color options for charts
+  const colorOptions = [
+    'rgba(75,192,192,0.4)',
+    'rgba(255,99,132,0.4)',
+    'rgba(54,162,235,0.4)',
+    'rgba(255,206,86,0.4)',
+    'rgba(153,102,255,0.4)',
+  ];
+
   // Handle dataset selection
   const handleDatasetChange = (event) => {
     const selectedOption = event.target.value;
@@ -119,15 +128,15 @@ const Dashboard = () => {
         {
           label: 'Dataset',
           data: values,
-          backgroundColor: 'rgba(75,192,192,0.4)',
-          borderColor: 'rgba(75,192,192,1)',
+          backgroundColor: colorOptions[0], // Default color
+          borderColor: colorOptions[0].replace(/0.4/, '1'), // Solid color for border
           borderWidth: 1
         }
       ]
     };
 
     // Add new chart to the list
-    setChartDataList([...chartDataList, { type: selectedChartType, data }]);
+    setChartDataList([...chartDataList, { type: selectedChartType, data, color: colorOptions[0] }]);
 
     // Reset selections
     setSelectedData([]);
@@ -135,10 +144,10 @@ const Dashboard = () => {
     setDataSelected(false);
   };
 
-  // Handle changing chart type of an existing chart
-  const changeChartType = (index, newType) => {
+  // Handle changing chart type or color of an existing chart
+  const changeChartTypeOrColor = (index, newType, newColor) => {
     const updatedChartList = chartDataList.map((chart, i) =>
-      i === index ? { ...chart, type: newType } : chart
+      i === index ? { ...chart, type: newType, color: newColor, data: { ...chart.data, datasets: [{ ...chart.data.datasets[0], backgroundColor: newColor, borderColor: newColor.replace(/0.4/, '1') }] } } : chart
     );
     setChartDataList(updatedChartList);
   };
@@ -227,7 +236,7 @@ const Dashboard = () => {
             <select
               style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1 }}
               value={chart.type}
-              onChange={(e) => changeChartType(index, e.target.value)}
+              onChange={(e) => changeChartTypeOrColor(index, e.target.value, chart.color)}
             >
               <option value="Bar">Bar Chart</option>
               <option value="Line">Line Chart</option>
@@ -236,6 +245,18 @@ const Dashboard = () => {
               <option value="Radar">Radar Chart</option>
             </select>
 
+            {/* Color dropdown for each chart */}
+            <select
+              style={{ position: 'absolute', top: '10px', left: '150px', zIndex: 1 }}
+              value={chart.color}
+              onChange={(e) => changeChartTypeOrColor(index, chart.type, e.target.value)}
+            >
+              {colorOptions.map((color, colorIndex) => (
+                <option key={colorIndex} value={color}>{`Color ${colorIndex + 1}`}</option>
+              ))}
+            </select>
+
+            {/* Render the chart */}
             {renderChart(chart)}
           </div>
         ))}
